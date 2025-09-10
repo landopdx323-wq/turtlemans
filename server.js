@@ -17,6 +17,9 @@ app.get("/proxy", async (req, res) => {
     res.removeHeader("X-Frame-Options");
     res.removeHeader("Content-Security-Policy");
 
+    // Allow cross-origin requests (CORS)
+    res.set("Access-Control-Allow-Origin", "*");
+
     res.send(body);
   } catch (err) {
     res.status(500).send("Error: " + err.message);
