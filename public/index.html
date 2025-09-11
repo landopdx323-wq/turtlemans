@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Proxy Browser</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; }
+    header { padding: 10px; background: #333; color: #fff; }
+    input { width: 70%; padding: 5px; }
+    button { padding: 5px 10px; }
+    iframe { width: 100%; height: 90vh; border: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <input id="urlInput" type="text" placeholder="Enter URL (https://...)" />
+    <button onclick="loadSite()">Go</button>
+  </header>
+  <iframe id="viewer" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+
+  <script>
+    function loadSite() {
+      const url = document.getElementById("urlInput").value;
+      const iframe = document.getElementById("viewer");
+      if (!url.startsWith("http")) {
+        alert("Please enter a full URL (with http/https).");
+        return;
+      }
+      iframe.src = "/proxy?url=" + encodeURIComponent(url);
+    }
+  </script>
+</body>
+</html>

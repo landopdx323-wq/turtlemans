@@ -1,29 +1,35 @@
-const express = require("express");
-const fetch = require("node-fetch");
+import express from "express";
+import fetch from "node-fetch";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
+// Proxy route
 app.get("/proxy", async (req, res) => {
-  const target = req.query.url;
-  if (!target) return res.status(400).send("Missing ?url=");
+  const targetUrl = req.query.url;
+
+  if (!targetUrl) {
+    return res.status(400).send("Missing url parameter");
+  }
 
   try {
-    const response = await fetch(target);
+    const response = await fetch(targetUrl);
     let body = await response.text();
 
-    // Strip headers that block embedding
-    res.set("Content-Type", "text/html; charset=utf-8");
-    res.removeHeader("X-Frame-Options");
-    res.removeHeader("Content-Security-Policy");
-
-    // Allow cross-origin requests (CORS)
-    res.set("Access-Control-Allow-Origin", "*");
+    // strip X-Frame-Options and CSP so site can load in iframe
+    res.setHeader("Content-Security-Policy", "");
+    res.setHeader("X-Frame-Options", "");
 
     res.send(body);
   } catch (err) {
-    res.status(500).send("Error: " + err.message);
+    res.status(500).send("Error fetching: " + err.message);
   }
 });
 
-app.listen(PORT, () => console.log("Proxy running on port " + PORT));
+// Serve static files (like index.html)
+app.use(express.static("public"));
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Proxy running on http://localhost:${PORT}`);
+});
